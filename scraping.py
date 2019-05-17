@@ -50,15 +50,18 @@ def mairie_net(session, url):
 	if(url == 'noisy-le-sec-93134'):
 		url = 'noisy-le-sec-93130'
 	(nom_maire,circonscription,depute,politique) = ('','','','')
+	page= session.get('https://www.mairie.net/local/mairies-villes-communes/mairie-'+url+'.htm')
 	try:
-		page= session.get('https://www.mairie.net/local/mairies-villes-communes/mairie-'+url+'.htm')
 		nom_maire = page.html.find('strong')[2].text
+	except IndexError:
+		log_error(url,'mairie_net: nom du maire')
+	try:
 		par_depute = page.html.find('h3~p',clean=True)[2].text
 		circonscription = par_depute.split('cette ',1)[1].split(' ')[0]
 		depute = par_depute.split('est ',1)[1].split(' élu',1)[0]
 		politique = par_depute.split('politique ',1)[1].split('.',1)[0]
 	except IndexError:
-		log_error(url,'mairie_net')
+		log_error(url,'mairie_net : paragraphe du député')
 	return(nom_maire,circonscription,depute,politique)
 
 def annuaire_des_mairies_com(session,name,dept):
@@ -77,30 +80,55 @@ def annuaire_des_mairies_com(session,name,dept):
 
 def mairie_biz(session,url):
 	page= session.get('https://www.mairie.biz/mairie-'+url+'.html')
-	(nom,bord)=('','')
+	(maire,nom,bord)=('','','')
 	try:
 		maire = page.html.find('div.col-lg-4>strong~p')[0].text
 		nom = maire.split(' (')[0]
 		if maire.split('(') : bord = maire.split('(')[1].split(')')[0]
 	except IndexError:
-		log_error(url,'mairies_biz')
+		log_error(url,'mairies_biz : récupérer le paragraphe du maire')
 	return(nom,bord)
 
 def mon_maire_fr(session,name,dept):
+	# c'est moche mais ca marche
 	if(name[1] == '-'):
 		name = name[0]+name[2:]
 	if('-st-' in name):
 		name = name.replace('-st-','-saint-')
+	if(name == 'auteuil'):
+		name = 'auteuil-le-roi'
+	
 	page= session.get('http://www.mon-maire.fr/maire-de-'+name+'-'+dept)
 	(ville,nom_maire,telephone,email,site,adresse,population,conseil3) = ('','','','','','','','')
 	try:
 		ville = page.html.find('title',first=True).text.split('de ',1)[1].split(' (')[0]
+	except IndexError:
+		ville = name
+	try:
 		nom_maire = page.html.find('b~span[itemprop=name]')[0].text
+	except IndexError:
+		log_error(name+'-'+dept,'mon_maire_fr : nom du maire')
+	try:
 		if page.html.find('b~span[itemprop=telephone]') : telephone = page.html.find('b~span[itemprop=telephone]')[0].text
+	except IndexError:
+		log_error(name+'-'+dept,'mon_maire_fr : telephone')
+	try:
 		if page.html.find('b~span[itemprop=email]') : email = page.html.find('b~span[itemprop=email]')[0].text
+	except IndexError:
+		log_error(name+'-'+dept,'mon_maire_fr : email')
+	try:
 		if page.html.find('b~span[itemprop=url]') : site = page.html.find('b~span[itemprop=url]')[0].text
+	except IndexError:
+		log_error(name+'-'+dept,'mon_maire_fr : site')
+	try:
 		adresse = page.html.find('b~span[itemprop=streetAddress]')[0].text
+	except IndexError:
+		log_error(name+'-'+dept,'mon_maire_fr : adresse')
+	try:
 		population = page.html.find('div.constructeur')[0].text.split(': ')[2].split('\nDép')[0]
+	except IndexError:
+		log_error(name+'-'+dept,'mon_maire_fr : population')
+	try:
 		conseil = page.html.find('td[class]')
 		if conseil:
 			conseil2 = []
@@ -108,7 +136,7 @@ def mon_maire_fr(session,name,dept):
 				conseil2.append(elmt.text)
 			conseil3=Counter(conseil2).most_common(3)
 	except IndexError:
-		log_error(name+'-'+dept,'mon_maire_fr')
+		log_error(name+'-'+dept,'mon_maire_fr : conseil')
 	return(ville,nom_maire,telephone,email,site,adresse,population,conseil3)
 
 def write_to_csv(csv_file,dept,results):
