@@ -12,6 +12,7 @@ le script crée un fichier CSV pour chaque département et va chercher des infor
  * www.mairie.net
  * www.mairie.biz
  * www.mon-maire.fr
+
 le format des fichiers CSV et la localisation où ils sont créés est configurable dans le fichier `config.ini`
 
 **DISCLAIMER : toutes les données utilisées sont PUBLIQUES** et leur utilisation est à des seules fin d'information.
@@ -49,3 +50,10 @@ optional arguments:
   --log LOG, -l LOG  log file, default : log.txt
   -d D               Département à récupérer
 ```
+
+## TODO
+
+ * couleur des maires à préciser
+ * notes sur le site
+ * notes sur Twitter
+ * front-end et migration vers une BD

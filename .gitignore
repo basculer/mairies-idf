@@ -1,0 +1,5 @@
+# exclude py cache
+/__pycache__
+twitterapi.ini
+log.txt
+csv/
