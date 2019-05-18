@@ -12,6 +12,7 @@ log_filename = 'log.txt'
 csv_filename = 'misc.csv'
 
 def initscrp(configfilename,dept):
+	'''init global vars'''
 	global configfile,log_filename, csv_filename
 	configfile = configfilename
 	(csv_filename_pattern,log_filename)=init_csv(configfile)
@@ -20,11 +21,14 @@ def initscrp(configfilename,dept):
 	return(session)
 
 def get_dept(session,dept):
+	'''returns city lists in the format 'cityville-75042'''
 	page = session.get('https://www.mairie.biz/plan-mairie-'+dept+'.html')
 	liste_communes = page.html.find('div.list-group>a')
 	return (liste_communes)
 
 def get_commune(session,commune,dept):
+	'''For each city in the format 'cityville-75042', gets in the 4 websites an array of information.
+	please use this method to change the look of the results (order of columns...) '''
 	url = commune.html.split('href="/mairie-')[1].split('.html')[0]
 	urlarray = url.split('-')
 	code = urlarray[len(urlarray)-1]
@@ -55,7 +59,7 @@ def get_commune(session,commune,dept):
 
 
 def wiki_parsing(session,dept):
-	#get city list
+	'''get city list'''
 	return
 
 def wiki_get_city(session,url):
@@ -161,7 +165,10 @@ def mon_maire_fr(session,name,dept):
 		log_error(name+'-'+dept,'mon_maire_fr : conseil')
 	return(ville,nom_maire,telephone,email,site,adresse,population,conseil3)
 
+
+
 def write_to_csv(results):
+	'''append an array of results for a city in a csv file (specified by the global var'''
 	csv_file = open(csv_filename,'w')
 	writer = csv.writer(csv_file)
 	writer.writerow(results)
@@ -176,6 +183,7 @@ def init_csv(configfile):
 	return(csv_dir+csv_file,log_file)
 
 def log_error(addr,funct):
+	'''logs a scraping/parsing error in the global variable-specified log file'''
 	print('######### Error dans la fonction '+funct+' du parsing de '+addr)
 	logfile = open(log_filename, "a")
 	logfile.write('######   ERROR : '+str(datetime.date.today())+'  #####\n')

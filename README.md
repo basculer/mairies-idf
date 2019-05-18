@@ -19,7 +19,7 @@ le format des fichiers CSV et la localisation où ils sont créés est configura
 
 ### Note de Site
 
-En plus de ces informations le script attribue une note écolo aux sites des mairies. Cette note est calculée avec le nombre d'occurence de mots-clés spécifiés dans le fichier `config.ini` pondérés.
+En plus de ces informations le script attribue une "note écolo" aux sites des mairies. Cette note est calculée avec le nombre d'occurence de mots-clés spécifiés dans le fichier `config.ini` pondérés.
 Les occurences de ces mots-clés sont mesurées sur :
  * la première page du site de la mairie
  * toutes les pages ou ressources vers lesquelles la premièr
