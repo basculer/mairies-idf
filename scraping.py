@@ -9,44 +9,66 @@ import datetime 		#pour logger
 
 configfile = 'config.ini'
 log_filename = 'log.txt'
+csv_filename = 'misc.csv'
 
 def initscrp(configfilename,dept):
-	global configfile,log_filename
+	global configfile,log_filename, csv_filename
 	configfile = configfilename
-	(csv_filename,log_filename)=init_csv(configfile)
+	(csv_filename_pattern,log_filename)=init_csv(configfile)
 	session = HTMLSession()
-	return(session,csv_filename+dept+'.csv')
+	csv_filename = csv_filename_pattern+dept+'.csv'
+	return(session)
 
-def get_dept(session,dept,csv_filename):
+def get_dept(session,dept):
 	page = session.get('https://www.mairie.biz/plan-mairie-'+dept+'.html')
 	liste_communes = page.html.find('div.list-group>a')
-	csv_file = open(csv_filename,'w')
-	for commune in liste_communes:
-		url = commune.html.split('href="/mairie-')[1].split('.html')[0]
-		urlarray = url.split('-')
-		code = urlarray[len(urlarray)-1]
-		name = url.split('-'+dept)[0] #l'astuce de ouf
-		print('scraping de '+name)
-		results = [code,name]
-		# print(name)
+	return (liste_communes)
 
-		## ici nous avons 4 sources differentes pour nos infos
-		(ville,nom_maire3,telephone,email,site,adresse,population,conseil) = mon_maire_fr(session,name,dept)
-		results.extend((ville,nom_maire3,telephone,email,site,adresse,population,conseil))
-		
-		(nom_maire2,bord_maire) = mairie_biz(session,url)
-		results.append(bord_maire)
-		
-		(nom_maire1,circonscription,depute,bord_dep) = mairie_net(session,url)
-		results.extend((circonscription,depute,bord_dep))
-		
-		# (adresse2,telephone2,email2,site2,population2) = annuaire_des_mairies_com(session,'vaujours','93')
-		# results.extend((adresse2,telephone2,email2,site2,population2))
-		write_to_csv(csv_file,dept,results)
+def get_commune(session,commune,dept):
+	url = commune.html.split('href="/mairie-')[1].split('.html')[0]
+	urlarray = url.split('-')
+	code = urlarray[len(urlarray)-1]
+	name = url.split('-'+dept)[0] #l'astuce de ouf
+	print('scraping de '+name)
+	results = [code,name]
+	# print(name)
+
+	## ici nous avons 4 sources differentes pour nos infos
+	#mon-maire.fr
+	(ville,nom_maire3,telephone,email,site,adresse,population,conseil) = mon_maire_fr(session,name,dept)
+	results.extend((ville,nom_maire3,telephone,email,site,adresse,population,conseil))
+	
+	#mairie.biz
+	(nom_maire2,bord_maire) = mairie_biz(session,url)
+	results.append(bord_maire)
+	
+	#mairie.net
+	(nom_maire1,circonscription,depute,bord_dep) = mairie_net(session,url)
+	results.extend((circonscription,depute,bord_dep))
+	
+	#annuaire-des-mairies.com
+	# (adresse2,telephone2,email2,site2,population2) = annuaire_des_mairies_com(session,'vaujours','93')
+	# results.extend((adresse2,telephone2,email2,site2,population2))
+
+	return(results)
+
+
+
+def wiki_parsing(session,dept):
+	#get city list
+	return
+
+def wiki_get_city(session,url):
+	#parse a city
+	#get mayor's political color
+	#log it into a csv file
+	return
+
 
 def mairie_net(session, url):
 	if('-st-' in url):
 		url = url.replace('-st-','-saint-')
+	#okay let's just say this was for testing purposes i know it's bad
 	if(url == 'noisy-le-sec-93134'):
 		url = 'noisy-le-sec-93130'
 	(nom_maire,circonscription,depute,politique) = ('','','','')
@@ -139,7 +161,8 @@ def mon_maire_fr(session,name,dept):
 		log_error(name+'-'+dept,'mon_maire_fr : conseil')
 	return(ville,nom_maire,telephone,email,site,adresse,population,conseil3)
 
-def write_to_csv(csv_file,dept,results):
+def write_to_csv(results):
+	csv_file = open(csv_filename,'w')
 	writer = csv.writer(csv_file)
 	writer.writerow(results)
 

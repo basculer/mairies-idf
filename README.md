@@ -54,6 +54,7 @@ optional arguments:
 ## TODO
 
  * couleur des maires à préciser
+ * scraper wikipédia
  * notes sur le site
  * notes sur Twitter
  * front-end et migration vers une BD

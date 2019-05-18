@@ -8,6 +8,8 @@ import sites
 
 global operation_realisee
 
+
+
 #---------------------------------------------------------------------------------------------------------------------
 # MAIN PROCESS
 #---------------------------------------------------------------------------------------------------------------------
@@ -26,13 +28,18 @@ if __name__ == '__main__':
 	print('using config file : '+str(args.config)+' and logging to : '+args.log)
 
 	#init config file
-	if args.d:
-		#scraping
-		(session, csv_file) = scrp.initscrp(args.config,args.d)
-		scrp.get_dept(session,args.d,csv_file)
-	else:
-		#site
-		(session,wordlist,moderation) = sites.initsite(args.config)
-		sites.parse_site(session,'http://www.avernes95.fr')
+
+	#scraping DB
+	(session) = scrp.initscrp(args.config,args.d)
+	liste_communes = scrp.get_dept(session,args.d)
+	for commune in liste_communes:
+		scrp.write_to_csv(scrp.get_commune(session,commune,args.d))
 	
+	#scraping site
+	# (session,wordlist,moderation) = sites.initsite(args.config)
+	# sites.parse_site(session,'http://www.avernes95.fr')
+	
+	# scraping wikipedia
+	# (session) = scrp.initscrp(args.config,'')
+	# scrp.wiki_get_city(session,'https://fr.wikipedia.org/wiki/Vaujours')
 
