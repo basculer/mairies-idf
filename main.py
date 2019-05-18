@@ -30,16 +30,18 @@ if __name__ == '__main__':
 	#init config file
 
 	#scraping DB
-	# (session) = scrp.initscrp(args.config,args.d)
-	# liste_communes = scrp.get_dept(session,args.d)
-	# for commune in liste_communes:
-	# 	scrp.write_to_csv(scrp.get_commune(session,commune,args.d))
+	(session) = scrp.initscrp(args.config,args.d)
+	liste_communes = scrp.get_dept(session,args.d)
+	for commune in liste_communes:
+		scrp.write_to_csv(scrp.get_commune(session,commune,args.d))
 	
 	#scraping site
 	# (session,wordlist,moderation) = sites.initsite(args.config)
 	# sites.parse_site(session,'http://www.avernes95.fr')
 	
 	# scraping wikipedia
-	(session) = scrp.initscrp(args.config,'')
-	scrp.wiki_get_city(session,'https://fr.wikipedia.org/wiki/Vaujours')
+	# (session) = scrp.initscrp(args.config,'')
+	# scrp.wiki_get_city(session,'https://fr.wikipedia.org/wiki/Vaujours')
+	# scrp.wiki_get_city(session,'https://fr.wikipedia.org/wiki/Rambouillet')
+	# scrp.wiki_get_city(session,'https://fr.wikipedia.org/wiki/Aubervilliers')
 

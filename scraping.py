@@ -63,10 +63,21 @@ def wiki_parsing(session,dept):
 	return
 
 def wiki_get_city(session,url):
-	#parse a city
+	'''Récupère l'étiquette politique des maires.
+	les etiquettes des maires sont les seules balises a avoir l'attribut style="text-align: center"
+	la ligne suivante cherche la liste des liens avec des atttributes href et title dont le parent est
+	une balise td dont l'attribut style commence par text-align etc'''
+	page= session.get(url)
+	print(url)
+	etiquette = ''
 	#get mayor's political color
-	#log it into a csv file
-	return
+	tableau_etiquettes_maires = page.html.find('table.wikitable.centre.communes tr td[style^=text-align] a[href][title]')
+	if tableau_etiquettes_maires : etiquette = tableau_etiquettes_maires[len(tableau_etiquettes_maires)-1].text
+	#le code postal est dans une box avec une balise <a href="/wiki/Code_postal_en_France" title="Code postal en France">
+	# admin = page.html.find('th[scope=row]>a[href~=Code_postal_en_France]~td')
+	admin = page.html.find('th[scope=row]>a[href][title]') #i can't get the <td> tag that i need
+	print(admin[0].text)
+	return etiquette
 
 
 def mairie_net(session, url):
