@@ -6,6 +6,7 @@ import configparser 	#pour la modularite
 import os				#pour supprimer les vieux csv
 import csv 				#pour la tambouille
 import datetime 		#pour logger
+import wikipedia
 
 configfile = 'config.ini'
 log_filename = 'log.txt'
@@ -18,13 +19,25 @@ def initscrp(configfilename,dept):
 	(csv_filename_pattern,log_filename)=init_csv(configfile)
 	session = HTMLSession()
 	csv_filename = csv_filename_pattern+dept+'.csv'
-	return(session)
+	csv_writer = csv.writer(open(csv_filename,'w'))
+	return(session,csv_writer)
 
 def get_dept(session,dept):
 	'''returns city lists in the format 'cityville-75042'''
 	page = session.get('https://www.mairie.biz/plan-mairie-'+dept+'.html')
 	liste_communes = page.html.find('div.list-group>a')
 	return (liste_communes)
+
+def get_wiki_page(session,ville):
+	wikipedia.set_lang("fr")
+	url=''
+	try:
+		url = wikipedia.page(ville).url
+		return wiki_get_city(session,url)
+	except (Warning,wikipedia.exceptions.DisambiguationError,wikipedia.exceptions.PageError):
+		log_error(ville,'wikipedia : Page non trouvée')
+		return ('','','')
+		
 
 def get_commune(session,commune,dept):
 	'''For each city in the format 'cityville-75042', gets in the 4 websites an array of information.
@@ -46,6 +59,13 @@ def get_commune(session,commune,dept):
 	(nom_maire2,bord_maire) = mairie_biz(session,url)
 	results.append(bord_maire)
 	
+	#wikipedia
+	(etiquette, wikicode,wiki_nom_maire) = get_wiki_page(session,ville)
+	if(wikicode != code):
+		log_error(url,'wikipedia : Mauvaise page')
+	else:
+		results.append(etiquette)
+
 	#mairie.net
 	(nom_maire1,circonscription,depute,bord_dep) = mairie_net(session,url)
 	results.extend((circonscription,depute,bord_dep))
@@ -58,9 +78,12 @@ def get_commune(session,commune,dept):
 
 
 
-def wiki_parsing(session,dept):
-	'''get city list'''
-	return
+# def wiki_parsing_dept(session,url):
+# 	'''get city list'''
+# 	page= session.get(url)
+# 	tableau_villes = page.html.find('table.wikitable.sortable',containing='Code Postal')
+# 	print(tableau_villes[0].html.find('tr'))
+# 	return
 
 def wiki_get_city(session,url):
 	'''Récupère l'étiquette politique des maires.
@@ -68,16 +91,17 @@ def wiki_get_city(session,url):
 	la ligne suivante cherche la liste des liens avec des atttributes href et title dont le parent est
 	une balise td dont l'attribut style commence par text-align etc'''
 	page= session.get(url)
-	print(url)
-	etiquette = ''
+	(etiquette,code_postal,nom_maire) = ('','','')
 	#get mayor's political color
 	tableau_etiquettes_maires = page.html.find('table.wikitable.centre.communes tr td[style^=text-align] a[href][title]')
 	if tableau_etiquettes_maires : etiquette = tableau_etiquettes_maires[len(tableau_etiquettes_maires)-1].text
 	#le code postal est dans une box avec une balise <a href="/wiki/Code_postal_en_France" title="Code postal en France">
-	# admin = page.html.find('th[scope=row]>a[href~=Code_postal_en_France]~td')
-	admin = page.html.find('th[scope=row]>a[href][title]') #i can't get the <td> tag that i need
-	print(admin[0].text)
-	return etiquette
+	box_code = page.html.find('tr',containing='Code postal')
+	if box_code : code_postal = box_code[0].text.split('\n')[1]
+	box_maire = page.html.find('tr',containing='Maire Mandat')
+	if box_maire : nom_maire = box_maire[0].text.split('\n')[2]
+	#la on peut recuperer tous les infos qu'on veut dans la boite wikipedia
+	return (etiquette,code_postal,nom_maire)
 
 
 def mairie_net(session, url):
@@ -178,10 +202,11 @@ def mon_maire_fr(session,name,dept):
 
 
 
-def write_to_csv(results):
-	'''append an array of results for a city in a csv file (specified by the global var'''
-	csv_file = open(csv_filename,'w')
-	writer = csv.writer(csv_file)
+def write_to_csv(writer,results):
+	'''append an array of results for a city in a csv file (specified by the global var
+	you can change here the look of the csv sheet as well'''
+	# csv_file = open(csv_filename,'w')
+	# writer = csv.writer(csv_file)
 	writer.writerow(results)
 
 def init_csv(configfile):
