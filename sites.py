@@ -26,4 +26,3 @@ def parse_site(session,url):
 	for link in links:
 		if link : print(link.links.pop())
 
-#XPATH ? ou search/searchall

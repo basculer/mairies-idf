@@ -22,22 +22,16 @@ def initscrp(configfilename,dept):
 	csv_writer = csv.writer(open(csv_filename,'w'))
 	return(session,csv_writer)
 
-def get_dept(session,dept):
-	'''returns city lists in the format 'cityville-75042'''
-	page = session.get('https://www.mairie.biz/plan-mairie-'+dept+'.html')
-	liste_communes = page.html.find('div.list-group>a')
-	return (liste_communes)
+def init_csv(configfile):
+	config=configparser.ConfigParser()
+	config.read(configfile)
+	csv_dir = config['CSV']['CSV_DIR']
+	csv_file = config['CSV']['CSV_FILE']
+	log_file = config['LOG']['LOG_FILE']
+	# os.remove(csv_dir+csv_file+dept+'.csv')
+	return(csv_dir+csv_file,log_file)
 
-def get_wiki_page(session,ville):
-	wikipedia.set_lang("fr")
-	url=''
-	try:
-		url = wikipedia.page(ville).url
-		return wiki_get_city(session,url)
-	except (Warning,wikipedia.exceptions.DisambiguationError,wikipedia.exceptions.PageError):
-		log_error(ville,'wikipedia : Page non trouvée')
-		return ('','','')
-		
+
 
 def get_commune(session,commune,dept):
 	'''For each city in the format 'cityville-75042', gets in the 4 websites an array of information.
@@ -78,12 +72,23 @@ def get_commune(session,commune,dept):
 
 
 
-# def wiki_parsing_dept(session,url):
-# 	'''get city list'''
-# 	page= session.get(url)
-# 	tableau_villes = page.html.find('table.wikitable.sortable',containing='Code Postal')
-# 	print(tableau_villes[0].html.find('tr'))
-# 	return
+def get_dept(session,dept):
+	'''returns city lists in the format 'cityville-75042'''
+	page = session.get('https://www.mairie.biz/plan-mairie-'+dept+'.html')
+	liste_communes = page.html.find('div.list-group>a')
+	return (liste_communes)
+
+def get_wiki_page(session,ville):
+	'''from the name of a city gets the wikipedia page, handles errors and passes them to the parsing method'''
+	wikipedia.set_lang("fr")
+	url=''
+	try:
+		url = wikipedia.page(ville).url
+		return wiki_get_city(session,url)
+	except (Warning,wikipedia.exceptions.DisambiguationError,wikipedia.exceptions.PageError):
+		log_error(ville,'wikipedia : Page non trouvée')
+		return ('','','')
+		
 
 def wiki_get_city(session,url):
 	'''Récupère l'étiquette politique des maires.
@@ -205,18 +210,8 @@ def mon_maire_fr(session,name,dept):
 def write_to_csv(writer,results):
 	'''append an array of results for a city in a csv file (specified by the global var
 	you can change here the look of the csv sheet as well'''
-	# csv_file = open(csv_filename,'w')
-	# writer = csv.writer(csv_file)
 	writer.writerow(results)
 
-def init_csv(configfile):
-	config=configparser.ConfigParser()
-	config.read(configfile)
-	csv_dir = config['CSV']['CSV_DIR']
-	csv_file = config['CSV']['CSV_FILE']
-	log_file = config['LOG']['LOG_FILE']
-	# os.remove(csv_dir+csv_file+dept+'.csv')
-	return(csv_dir+csv_file,log_file)
 
 def log_error(addr,funct):
 	'''logs a scraping/parsing error in the global variable-specified log file'''

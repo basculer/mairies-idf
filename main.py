@@ -39,10 +39,3 @@ if __name__ == '__main__':
 	# (session,wordlist,moderation) = sites.initsite(args.config)
 	# sites.parse_site(session,'http://www.avernes95.fr')
 	
-	# scraping wikipedia
-	# (session) = scrp.initscrp(args.config,'')
-	# scrp.wiki_parsing_dept(session,'https://fr.wikipedia.org/wiki/Seine-Saint-Denis')
-	# scrp.wiki_get_city(session,'https://fr.wikipedia.org/wiki/Vaujours')
-	# scrp.wiki_get_city(session,'https://fr.wikipedia.org/wiki/Rambouillet')
-	# scrp.wiki_get_city(session,'https://fr.wikipedia.org/wiki/Aubervilliers')
-

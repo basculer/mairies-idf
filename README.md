@@ -53,8 +53,6 @@ optional arguments:
 
 ## TODO
 
- * scraper wikipédia
- * logs pour wikipédia
  * notes sur le site
  * notes sur Twitter
  * front-end et migration vers une BD
