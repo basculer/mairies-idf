@@ -5,6 +5,7 @@ import configparser
 
 import scraping as scrp
 import sites
+import twitter as twt
 
 global operation_realisee
 
@@ -35,6 +36,10 @@ if __name__ == '__main__':
 	for commune in liste_communes:
 		scrp.write_to_csv(csv_writer,scrp.get_commune(session,commune,args.d))
 	
+	#scraping Twitter
+	# (twitter_api,wordlist) = twt.init_twitter(args.config)
+	# twt.get_note(twitter_api,'Vaujours','93410',wordlist)
+
 	#scraping site
 	# (session,wordlist,moderation) = sites.initsite(args.config)
 	# sites.parse_site(session,'http://www.avernes95.fr')
