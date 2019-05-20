@@ -12,11 +12,12 @@ configfile = 'config.ini'
 log_filename = 'log.txt'
 csv_filename = 'misc.csv'
 
-def initscrp(configfilename,dept):
+def initscrp(configfilename,dept,log_file_name):
 	'''init global vars'''
 	global configfile,log_filename, csv_filename
 	configfile = configfilename
-	(csv_filename_pattern,log_filename)=init_csv(configfile)
+	log_filename = log_file_name
+	(csv_filename_pattern)=init_csv(configfile)
 	session = HTMLSession()
 	csv_filename = csv_filename_pattern+dept+'.csv'
 	csv_writer = csv.writer(open(csv_filename,'w'))
@@ -27,9 +28,8 @@ def init_csv(configfile):
 	config.read(configfile)
 	csv_dir = config['CSV']['CSV_DIR']
 	csv_file = config['CSV']['CSV_FILE']
-	log_file = config['LOG']['LOG_FILE']
 	# os.remove(csv_dir+csv_file+dept+'.csv')
-	return(csv_dir+csv_file,log_file)
+	return(csv_dir+csv_file)
 
 
 
@@ -50,8 +50,8 @@ def get_commune(session,commune,dept):
 	results.extend((ville,nom_maire3,telephone,email,site,adresse,population,conseil))
 	
 	#mairie.biz
-	(nom_maire2,bord_maire) = mairie_biz(session,url)
-	results.append(bord_maire)
+	# (nom_maire2,bord_maire) = mairie_biz(session,url)
+	# results.append(bord_maire)
 	
 	#wikipedia
 	(etiquette, wikicode,wiki_nom_maire) = get_wiki_page(session,ville)
@@ -61,8 +61,8 @@ def get_commune(session,commune,dept):
 		results.append(etiquette)
 
 	#mairie.net
-	(nom_maire1,circonscription,depute,bord_dep) = mairie_net(session,url)
-	results.extend((circonscription,depute,bord_dep))
+	# (nom_maire1,circonscription,depute,bord_dep) = mairie_net(session,url)
+	# results.extend((circonscription,depute,bord_dep))
 	
 	#annuaire-des-mairies.com
 	# (adresse2,telephone2,email2,site2,population2) = annuaire_des_mairies_com(session,'vaujours','93')

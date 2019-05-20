@@ -2,14 +2,44 @@
 
 import argparse
 import configparser
+try: # pour l'import des wordlist dans le fichier de config
+    import json
+except ImportError:
+    import simplejson as json
 
 import scraping as scrp
 import sites
 import twitter as twt
 
 global operation_realisee
+total_coeffs = 0
 
 
+def init_config(config_file_name):
+	config=configparser.ConfigParser()
+	config.read(config_file_name)
+	log_filename = config['LOG']['LOG_FILE']
+	wordlist = json.loads(config['ANALYSIS']['WORDLIST'])
+	moderation = json.loads(config['ANALYSIS']['MODERATION'])
+	twitterapifile = config['TWEEPY']['API_FILE']
+	return(log_filename,wordlist,twitterapifile)
+
+def count_total_coeff(wordlist):
+	global total_coeffs
+	for word in wordlist:
+		total_coeffs += word['coef']
+	return total_coeffs
+
+def get_dept_in_csv(session,dept,dept_str,wordlist,csv_writer):
+	# scrp.initcsv(dept_str)
+	liste_communes = scrp.get_dept(session,dept)
+
+	for commune in liste_communes:
+		results=scrp.get_commune(session,commune,args.d)
+		results.append(sites.analyse_site(results[6],wordlist))
+		# results.extend(twt.get_note(twitter_api,results[2],results[0],results[1],wordlist)) 
+		scrp.write_to_csv(csv_writer,results)
+		# print(results)
 
 #---------------------------------------------------------------------------------------------------------------------
 # MAIN PROCESS
@@ -29,20 +59,20 @@ if __name__ == '__main__':
 	print('using config file : '+str(args.config)+' and logging to : '+args.log)
 
 	#init config file
+	(log_filename,wordlist,twitterapifile) = init_config(args.config)
+	total_coeffs = count_total_coeff(wordlist)
 
 	#scraping DB
-	(session,csv_writer) = scrp.initscrp(args.config,args.d)
-	liste_communes = scrp.get_dept(session,args.d)
+	(session,csv_writer) = scrp.initscrp(args.config,args.d,log_filename)
 	#scraping Twitter
-	(twitter_api,wordlist) = twt.init_twitter(args.config)
-	for commune in liste_communes:
-		results=scrp.get_commune(session,commune,args.d)
-		results.extend(twt.get_note(twitter_api,results[2],results[0],results[1],wordlist)) 
-		scrp.write_to_csv(csv_writer,results)
-		print(results)
-	
-	
+	(twitter_api) = twt.init_twitter(twitterapifile,total_coeffs,log_filename)
 	#scraping site
-	# (session,wordlist,moderation) = sites.initsite(args.config)
-	# sites.parse_site(session,'http://www.avernes95.fr')
+	sites.initsite(total_coeffs,log_filename)
+
+	get_dept_in_csv(session,args.d,args.d,wordlist,csv_writer)
+
+	# sites.analyse_site('http://www.avernes95.fr',wordlist)
+	# print(sites.analyse_site('http://www.vaujours.fr',wordlist))
+	# sites.inspect_page('http://www.vaujours.fr/-Les-espaces-natures-',wordlist)
+	# sites.inspect_page('http://www.vaujours.fr/Collecte-des-dechets',wordlist)
 	

@@ -8,8 +8,7 @@ except ImportError:
     import simplejson as json
 import csv
 
-config_file = 'config.ini'
-total_coeffs = 1
+total_coeffs = 0
 
 def get_note(api,name,code,name_short,wordlist):
 	print('start Twitter : '+name)
@@ -28,27 +27,19 @@ def get_note(api,name,code,name_short,wordlist):
 	
 	pertinence *= (1/(1+len(userslist)))
 	#formule finale a revoir!!!
-	# = 30 si tous les mots apparaissent 10 fois /100 et viennent d un compte officiel unique
+	# = 20 si tous les mots apparaissent 10 fois /100 et viennent d un compte officiel unique
 	# score_twitter = ((10*raw_score+(20*officials_score/(len(userslist)+1)))/total_coeffs)
 	score_twitter = ((10*raw_score+(20*officials_score))/total_coeffs)
 	if (score_twitter > 20):
 		score_twitter = 20
 		pertinence/2
-	return (score_twitter,float("{0:.2f}".format(pertinence)))
+	return (score_twitter,float("{0:.3f}".format(pertinence)))
 
 
-def init_twitter(config_file_name):
-	global config_file, total_coeffs
-	config_file = config_file_name
-	global_config=configparser.ConfigParser()
-	global_config.read(config_file_name)
-	twitter_api_file_name = global_config['TWEEPY']['API_FILE']
+def init_twitter(twitter_api_file_name,total_coeffs_global,log_file_name):
+	global total_coeffs
 	print('Using Twitter API file : '+twitter_api_file_name)
-
-	wordlist = json.loads(global_config['ANALYSIS']['WORDLIST'])
-	moderation = json.loads(global_config['ANALYSIS']['MODERATION'])
-	for word in wordlist:
-		total_coeffs += word['coef']
+	total_coeffs = total_coeffs_global
 
 	twitter_config = configparser.ConfigParser()
 	twitter_config.read(twitter_api_file_name)
@@ -62,7 +53,7 @@ def init_twitter(config_file_name):
 	auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 	# Create the api to connect to twitter with your credentials
 	api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True, compression=True)
-	return(api,wordlist)
+	return(api)
 
 def get_raw_search(api,name,wordlist):
 	query = " ".join([word['name'] for word in wordlist])
