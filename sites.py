@@ -53,7 +53,7 @@ def inspect_page(url,wordlist,session):
 			# print(word['name']+' : '+str(count))
 		return count
 	except:
-		log_error()
+		log_error(url,'inspect website page')
 		return 0
 
 

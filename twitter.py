@@ -60,7 +60,6 @@ def get_raw_search(api,name,wordlist):
 	score = 0
 	for word in wordlist:
 		count = keyword_count(api,name+' "'+word['name']+'" since:2014-04-30 -filter:retweets')
-		# count2 = keyword_count(api,code+' "'+word['name']+'" since:2014-04-30 -filter:retweets')
 		# print(name+' : "'+word['name']+'" : '+str(count)+' with coeff '+str(word['coef']))
 		score += ((count)*word['coef'])
 	return score

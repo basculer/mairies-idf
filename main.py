@@ -30,12 +30,11 @@ def count_total_coeff(wordlist):
 		total_coeffs += word['coef']
 	return total_coeffs
 
-def get_dept_in_csv(session,dept,dept_str,wordlist,csv_writer):
-	# scrp.initcsv(dept_str)
+def get_dept_in_csv(session,dept,wordlist,csv_writer):
 	liste_communes = scrp.get_dept(session,dept)
 
 	for commune in liste_communes:
-		results=scrp.get_commune(session,commune,args.d)
+		results=scrp.get_commune(session,commune,dept)
 		results.append(sites.analyse_site(results[6],wordlist))
 		# results.extend(twt.get_note(twitter_api,results[2],results[0],results[1],wordlist)) 
 		scrp.write_to_csv(csv_writer,results)
@@ -62,14 +61,21 @@ if __name__ == '__main__':
 	(log_filename,wordlist,twitterapifile) = init_config(args.config)
 	total_coeffs = count_total_coeff(wordlist)
 
-	#scraping DB
-	(session,csv_writer) = scrp.initscrp(args.config,args.d,log_filename)
-	#scraping Twitter
+	
+	#init scraping Twitter
 	(twitter_api) = twt.init_twitter(twitterapifile,total_coeffs,log_filename)
-	#scraping site
+	#init scraping site
 	sites.initsite(total_coeffs,log_filename)
 
-	get_dept_in_csv(session,args.d,args.d,wordlist,csv_writer)
+	if(args.d):
+		#scraping DB
+		(session,csv_writer) = scrp.initscrp(args.config,args.d,log_filename)
+		get_dept_in_csv(session,args.d,wordlist,csv_writer)
+	else:
+		#init scraping DB
+		(session,csv_writer) = scrp.initscrp(args.config,'all',log_filename) # only log all in one CSV file
+		for dept in [77,78,91,92,93,94,95]:
+			get_dept_in_csv(session,str(dept),wordlist,csv_writer)
 
 	# sites.analyse_site('http://www.avernes95.fr',wordlist)
 	# print(sites.analyse_site('http://www.vaujours.fr',wordlist))
