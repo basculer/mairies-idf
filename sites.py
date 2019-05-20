@@ -3,6 +3,7 @@
 from requests_html import HTMLSession	# pour le crawling
 from collections import Counter 		# pour les stats
 import configparser 					#pour la modularite
+import datetime 						#pour logger
 try: # pour l'import des wordlist dans le fichier de config
     import json
 except ImportError:
@@ -24,7 +25,9 @@ def analyse_site(url,wordlist):
 	for link in links_list:
 		site_score += inspect_page(link,wordlist,session)
 	#site_score = 20 si tous les mots sont mentionnés sur un cinquième des pages
-	score = site_score*5*20/(len(links_list)*total_coeffs)
+	score = 0
+	if links_list : 
+		score = site_score*5*20/(len(links_list)*total_coeffs)
 	if score > 20 : score = 20
 	return (float("{0:.3f}".format(score)))
 

@@ -2,6 +2,7 @@
 
 import tweepy
 import configparser 	#pour la modularite
+import datetime 		#pour logger
 try:
     import json
 except ImportError:

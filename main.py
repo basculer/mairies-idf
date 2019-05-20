@@ -6,6 +6,7 @@ try: # pour l'import des wordlist dans le fichier de config
     import json
 except ImportError:
     import simplejson as json
+import datetime 		#pour logger
 
 import scraping as scrp
 import sites
@@ -36,7 +37,7 @@ def get_dept_in_csv(session,dept,wordlist,csv_writer):
 	for commune in liste_communes:
 		results=scrp.get_commune(session,commune,dept)
 		results.append(sites.analyse_site(results[6],wordlist))
-		# results.extend(twt.get_note(twitter_api,results[2],results[0],results[1],wordlist)) 
+		results.extend(twt.get_note(twitter_api,results[2],results[0],results[1],wordlist)) 
 		scrp.write_to_csv(csv_writer,results)
 		# print(results)
 
