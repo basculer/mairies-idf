@@ -57,6 +57,7 @@ def get_commune(session,commune,dept):
 	(etiquette, wikicode,wiki_nom_maire) = get_wiki_page(session,ville)
 	if(wikicode != code):
 		log_error(url,'wikipedia : Mauvaise page')
+		results.append('')
 	else:
 		results.append(etiquette)
 

@@ -33,7 +33,8 @@ def count_total_coeff(wordlist):
 
 def get_dept_in_csv(session,dept,wordlist,csv_writer):
 	liste_communes = scrp.get_dept(session,dept)
-
+	titles=['code postal','nom','nom','maire','numéro de la mairie','mail de la mairie','site de la mairie','adresse de la mairie','population','orientation du conseil municipal','étiquette du maire','étiquette du maire','circonscription','député','parti du député','not site','note twitter','pertinence twitter']
+	scrp.write_to_csv(csv_writer,titles)
 	for commune in liste_communes:
 		results=scrp.get_commune(session,commune,dept)
 		results.append(sites.analyse_site(results[6],wordlist))
@@ -73,7 +74,7 @@ if __name__ == '__main__':
 	else:
 		#init scraping DB
 		(session,csv_writer) = scrp.initscrp(args.config,'all',log_filename) # only log all in one CSV file
-		for dept in [77,78,91,92,93,94,95]:
+		for dept in [77,78,91,92,93,94,95,75]:
 			get_dept_in_csv(session,str(dept),wordlist,csv_writer)
 
 	# sites.analyse_site('http://www.avernes95.fr',wordlist)
