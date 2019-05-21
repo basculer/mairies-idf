@@ -12,7 +12,7 @@ import scraping as scrp
 import sites
 import twitter as twt
 
-global operation_realisee
+
 total_coeffs = 0
 
 
@@ -46,17 +46,15 @@ def get_dept_in_csv(session,dept,wordlist,csv_writer):
 #---------------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-	global operation_realisee
 	
 	#Instantiate the parser
 	parser = argparse.ArgumentParser(description='Script pour La Bascule IDF\nscraping des mairies en IDF.')
-	parser.add_argument('--config', required=True, help='required config file')
+	parser.add_argument('--config', help='required config file', default='config.ini')
 	parser.add_argument('--log', '-l', help='log file, default : log.txt', default='log.txt')
 	parser.add_argument('-d', type=str, help='Département à gérer')
 	args = parser.parse_args()
 
-	# operation_realisee=str(input("Opération réalisée : "))
-	print('using config file : '+str(args.config)+' and logging to : '+args.log)
+	print('Using config file : '+str(args.config)+' and logging to : '+args.log)
 
 	#init config file
 	(log_filename,wordlist,twitterapifile) = init_config(args.config)

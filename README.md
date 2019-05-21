@@ -36,7 +36,7 @@ Le processus de note écolo Twitter cherche :
  * le nombre de tweets retournés par la recherche `<nom de la ville> <mot-clé>` pour chaque mot-clé, pondéré par le coefficient dudit mot-clé.
  * le nombre de tweets venant des comptes officiels retournés par les mêmes recherches. Les comptes officiels sont déterminés par ce que renvoie une recherche de compte de type `ville de <nom de la ville>`. S'il y a plusieurs résultats, les scores sont pondérés par `1/<ordre de retour du compte>`. Par exemple, un compte arrivant second de la recherche a un coefficient 1/2 dans le score, le troisième a un coefficient 1/3.
 
-Toutes les recherches de tweets ne cherchent que les tweets en français à partir des dernières élections municipales.
+La note Twitter est bornée à 20/20. Elle est calculée de manière à valoir 30/20 si tous les mots apparaissent 10 fois/100 dans les tweets du compte officiel. Toutes les recherches de tweets ne cherchent que les tweets en français à partir des dernières élections municipales.
 
 ### Environnement
 modules needed : 
@@ -69,4 +69,7 @@ optional arguments:
 
  * formule note site
  * formule note Twitter
+ * test IDF
+ * utiliser l'API Cursor de Tweepy pour éviter les rate limits
+ * gérer le `site-packages/wikipedia/wikipedia.py:389: UserWarning` avec `features="lxml"`
  * front-end et migration vers une BD
