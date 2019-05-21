@@ -33,15 +33,18 @@ def analyse_site(url,wordlist):
 
 
 def parse_site(url,session):
-	page = session.get(url)
-	links = page.html.find('a[href]')
-	url_short = url.split('.')[len(url.split('.'))-2]
-	# print('url short : '+url_short)
 	links_list = []
-	for link in links:
-		if link.links : 
-			if url_short in link.absolute_links.pop():
-				links_list.append(link.absolute_links.pop())
+	try:
+		page = session.get(url)
+		links = page.html.find('a[href]')
+		url_short = url.split('.')[len(url.split('.'))-2]
+		# print('url short : '+url_short)
+		for link in links:
+			if link.links : 
+				if url_short in link.absolute_links.pop():
+					links_list.append(link.absolute_links.pop())
+	except:
+		log_error(url,'get main page of website')
 	return links_list
 
 def inspect_page(url,wordlist,session):
