@@ -25,7 +25,15 @@ def seleget_FH(url):
 	print(driver.page_source)
 	driver.quit()
 
-def parse_json():
+def get_projects(transiscope, city_code):
+	city_projects = []
+	for elmt in transiscope['data']:
+		if("postalCode" in elmt['address']):
+			if(elmt['address']['postalCode']==city_code):
+				city_projects.append(elmt)
+	return city_projects
+
+def parse_json(transiscope):
 	'''ORGA DU JSON : 
 		- licence
 		- ontology
@@ -34,7 +42,11 @@ def parse_json():
 			- name
 			- geo{}
 			- sourceKey
-			- address
+			- address{}
+				- streetAddress
+				- addressLocality
+				- postalCode
+				- addressCountry
 			- createdAt
 			- updatedAt
 			- categories[]
@@ -43,6 +55,9 @@ def parse_json():
 			- website
 			- tags[]
 	'''
+	for elmt in transiscope['data']:
+		if("postalCode" in elmt['address']):
+			print(elmt['address']['postalCode'])
 
 def init_trans(db_filename):
 	with open(db_filename, 'r') as file_db:
@@ -56,8 +71,5 @@ if __name__ == '__main__':
 	parser.add_argument('--db',help='required JSON file for testing')
 	args = parser.parse_args()
 	(transiscope,session) = init_trans(args.db)
-	print(transiscope['licence'])
-	print(transiscope['data'][1])
-	# get_page(session,'le-pecq')
-	# seleget_FH('https://transiscope.org/carte-des-alternatives/#/liste/vaujours?cat=all')
-	# seleget_FH('https://presdecheznous.fr/annuaire#/liste/le-pecq?cat=all')
+	# parse_json(transiscope)	
+	project_list = get_projects(transiscope,'95400')
