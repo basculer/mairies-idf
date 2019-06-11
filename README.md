@@ -38,7 +38,16 @@ Le processus de note écolo Twitter cherche :
 
 La note Twitter est bornée à 20/20. Elle est calculée de manière à valoir 30/20 si tous les mots apparaissent 10 fois/100 dans les tweets du compte officiel. Toutes les recherches de tweets ne cherchent que les tweets en français à partir des dernières élections municipales.
 
-### Environnement
+### Note Transiscope
+
+le script utilise l'API du [transiscope](https://transiscope.org/) pour noter les projets déjà répertoriés.
+
+Il retourne deux scores : 
+
+ * le nombre de projets situés dans la ville, répertoriés sur le transiscope
+ * la pertinence écologique de ces projets (avec la wordlist dans le fichier de configuration)
+
+## Environnement
 modules needed : 
  * tweepy
  * requests-html
