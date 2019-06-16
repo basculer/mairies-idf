@@ -10,7 +10,6 @@ import wikipedia
 
 configfile = 'config.ini'
 log_filename = 'log.txt'
-# csv_filename = 'misc.csv'
 
 def initscrp(configfilename,log_file_name):
 	'''init global vars'''

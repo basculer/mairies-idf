@@ -11,20 +11,6 @@ try:
 except ImportError:
     import simplejson as json
 
-def seleget_FH(url):
-	options = Options()
-	# options.add_argument("--headless")
-	options.add_argument("user-agent=Mozilla/5.0 (X11; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0")
-	options.add_argument("token=a730b2dc-86a5-4a02-b667-0b1dbc1cc5a6")
-	options.headless = True
-	driver = webdriver.Firefox(options=options)
-	print("### Firefox Headless Browser Invoked")
-	driver.get(url)
-	time.sleep(10)
-	# elem = driver.find_element_by_id("menu")
-	print(driver.page_source)
-	driver.quit()
-
 def get_score(project_list, wordlist):
 	score = 0
 	for project in project_list:
@@ -38,7 +24,7 @@ def get_score(project_list, wordlist):
 			for word in wordlist:
 				if(word in project['abstract']):
 					score+=1
-	print(score)
+	# print(score)
 	return(len(project_list),score)
 
 

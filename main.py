@@ -18,7 +18,6 @@ from requests_html import HTMLSession #pour recuperer la liste des villes
 
 
 total_coeffs = 0
-TITLES=['code postal','nom','nom','maire','numéro de la mairie','mail de la mairie','site de la mairie','adresse de la mairie','population','orientation du conseil municipal','étiquette du maire','étiquette du maire','circonscription','député','parti du député','not site','note twitter','pertinence twitter','nbre projets transiscopre','note écolo transiscope']
 
 
 def init_config(config_file_name):
@@ -37,6 +36,9 @@ def init_config(config_file_name):
 
 def init_csv(csv_filepattern,dept):
 	csv_filename = csv_filepattern+dept+'.csv'
+	csv_writer = csv.writer(open(csv_filename,'w'))
+	TITLES=['code postal','nom','nom','maire','numéro de la mairie','mail de la mairie','site de la mairie','adresse de la mairie','population','orientation du conseil municipal','étiquette du maire','étiquette du maire','circonscription','député','parti du député','not site','note twitter','pertinence twitter','nbre projets transiscopre','note écolo transiscope']
+	csv_writer.writerow(TITLES)
 	return csv_filename
 
 
@@ -51,26 +53,21 @@ def get_dept_in_csv(dept,wordlist,csv_filename, transiscope,trans_wordlist):
 	session_list = HTMLSession()
 	liste_communes = scrp.get_dept(session_list,dept)
 	session_list.close()
-	write_to_csv(csv_filename,TITLES)
 	for commune in liste_communes:
 		get_commune_csv(csv_filename,commune,dept,wordlist,trans_wordlist,transiscope,twitter_api)
 		# print(results)
 
 def get_commune_csv(csv_filename,commune,dept, wordlist,trans_wordlist, transiscope,twitter_api):
 	results=scrp.get_commune(commune,dept)
-	print(results)
 	results.append(sites.analyse_site(results[6],wordlist))
-	print(results)
 	results.extend(twt.get_note(twitter_api,results[2],results[0],results[1],wordlist)) 
-	print(results)
 	results.extend(trans.get_city(transiscope,results[0],trans_wordlist))
-	print(results)
-	scrp.write_to_csv(csv_filename,results)
+	write_to_csv(csv_filename,results)
 
 
 def write_to_csv(csv_filename,results):
 	'''ecrit le tableau de resultat dans le fichier csv dont le nom est specifie ici'''
-	csv_writer = csv.writer(open(csv_filename,'w'))
+	csv_writer = csv.writer(open(csv_filename,'a'))
 	csv_writer.writerow(results)
 
 

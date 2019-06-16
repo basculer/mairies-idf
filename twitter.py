@@ -12,7 +12,6 @@ import csv
 total_coeffs = 0
 
 def get_note(api,name,code,name_short,wordlist):
-	# print('start Twitter : '+name)
 	pertinence = 1
 	if(name == ''):
 		name = name_short
