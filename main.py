@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 
-import argparse
-import configparser
-try: # pour l'import des wordlist dans le fichier de config
+import argparse 		#pour que le script soit propre
+import configparser 	#pour que le script soit modulable
+import csv 				#pour écrire les résults
+try: 					# pour l'import des wordlist dans le fichier de config
     import json
 except ImportError:
     import simplejson as json
@@ -13,8 +14,11 @@ import sites
 import twitter as twt
 import transiscope as trans
 
+from requests_html import HTMLSession #pour recuperer la liste des villes
+
 
 total_coeffs = 0
+TITLES=['code postal','nom','nom','maire','numéro de la mairie','mail de la mairie','site de la mairie','adresse de la mairie','population','orientation du conseil municipal','étiquette du maire','étiquette du maire','circonscription','député','parti du député','not site','note twitter','pertinence twitter','nbre projets transiscopre','note écolo transiscope']
 
 
 def init_config(config_file_name):
@@ -26,7 +30,15 @@ def init_config(config_file_name):
 	twitterapifile = config['TWEEPY']['API_FILE']
 	transi_db_file = config['TRANSISCOPE']['DB_FILENAME']
 	transi_wordlist = json.loads(config['TRANSISCOPE']['WORDLIST'])
-	return(log_filename,wordlist,twitterapifile,transi_db_file,transi_wordlist)
+	csv_dir = config['CSV']['CSV_DIR']
+	csv_file = config['CSV']['CSV_FILE']
+	return(log_filename,wordlist,twitterapifile,transi_db_file,transi_wordlist, csv_dir+csv_file)
+
+
+def init_csv(csv_filepattern,dept):
+	csv_filename = csv_filepattern+dept+'.csv'
+	return csv_filename
+
 
 def count_total_coeff(wordlist):
 	global total_coeffs
@@ -34,17 +46,33 @@ def count_total_coeff(wordlist):
 		total_coeffs += word['coef']
 	return total_coeffs
 
-def get_dept_in_csv(session,dept,wordlist,csv_writer, transiscope,trans_wordlist):
-	liste_communes = scrp.get_dept(session,dept)
-	titles=['code postal','nom','nom','maire','numéro de la mairie','mail de la mairie','site de la mairie','adresse de la mairie','population','orientation du conseil municipal','étiquette du maire','étiquette du maire','circonscription','député','parti du député','not site','note twitter','pertinence twitter','nbre projets transiscopre','note écolo transiscope']
-	scrp.write_to_csv(csv_writer,titles)
+def get_dept_in_csv(dept,wordlist,csv_filename, transiscope,trans_wordlist):
+	twitter_api = twt.get_twitter_api(twitter_auth)
+	session_list = HTMLSession()
+	liste_communes = scrp.get_dept(session_list,dept)
+	session_list.close()
+	write_to_csv(csv_filename,TITLES)
 	for commune in liste_communes:
-		results=scrp.get_commune(session,commune,dept)
-		# results.append(sites.analyse_site(results[6],wordlist))
-		# results.extend(twt.get_note(twitter_api,results[2],results[0],results[1],wordlist)) 
-		results.extend(trans.get_city(transiscope,results[0],trans_wordlist))
-		scrp.write_to_csv(csv_writer,results)
+		get_commune_csv(csv_filename,commune,dept,wordlist,trans_wordlist,transiscope,twitter_api)
 		# print(results)
+
+def get_commune_csv(csv_filename,commune,dept, wordlist,trans_wordlist, transiscope,twitter_api):
+	results=scrp.get_commune(commune,dept)
+	print(results)
+	results.append(sites.analyse_site(results[6],wordlist))
+	print(results)
+	results.extend(twt.get_note(twitter_api,results[2],results[0],results[1],wordlist)) 
+	print(results)
+	results.extend(trans.get_city(transiscope,results[0],trans_wordlist))
+	print(results)
+	scrp.write_to_csv(csv_filename,results)
+
+
+def write_to_csv(csv_filename,results):
+	'''ecrit le tableau de resultat dans le fichier csv dont le nom est specifie ici'''
+	csv_writer = csv.writer(open(csv_filename,'w'))
+	csv_writer.writerow(results)
+
 
 #---------------------------------------------------------------------------------------------------------------------
 # MAIN PROCESS
@@ -52,7 +80,7 @@ def get_dept_in_csv(session,dept,wordlist,csv_writer, transiscope,trans_wordlist
 
 if __name__ == '__main__':
 	
-	#Instantiate the parser
+	#recupere les arguments du programme
 	parser = argparse.ArgumentParser(description='Script pour La Bascule IDF\nscraping des mairies en IDF.')
 	parser.add_argument('--config', help='required config file', default='config.ini')
 	parser.add_argument('--log', '-l', help='log file, default : log.txt', default='log.txt')
@@ -61,31 +89,28 @@ if __name__ == '__main__':
 
 	print('Using config file : '+str(args.config)+' and logging to : '+args.log)
 
-	#init config file
-	(log_filename,wordlist,twitterapifile,transi_db_file,transi_wordlist) = init_config(args.config)
+	#initie le fichier de config
+	(log_filename,wordlist,twitterapifile,transi_db_file,transi_wordlist,csv_filepattern) = init_config(args.config)
 	total_coeffs = count_total_coeff(wordlist)
 
 	
-	#init scraping Twitter
-	(twitter_api) = twt.init_twitter(twitterapifile,total_coeffs,log_filename)
-	#init scraping site
+	#initie le scraping Twitter
+	(twitter_auth) = twt.init_twitter(twitterapifile,total_coeffs,log_filename)
+	#initie le scraping site
 	sites.initsite(total_coeffs,log_filename)
 
-	#init transiscope JSON
+	#initie le fichier JSON du transiscope
 	transiscope = trans.init_trans(transi_db_file)
 
 	if(args.d):
-		#scraping DB
-		(session,csv_writer) = scrp.initscrp(args.config,args.d,log_filename)
-		get_dept_in_csv(session,args.d,wordlist,csv_writer,transiscope,transi_wordlist)
+		csv_filename = init_csv(csv_filepattern,args.d)
+		scrp.initscrp(args.config,log_filename)
+		get_dept_in_csv(args.d,wordlist,csv_filename,transiscope,transi_wordlist)
 	else:
-		#init scraping DB
-		(session,csv_writer) = scrp.initscrp(args.config,'all',log_filename) # only log all in one CSV file
+		# dans ce cas-la, tous les resultats seront ecrits dans un unique CSV central
+		scrp.initscrp(args.config,log_filename) 
+		csv_filename = init_csv(csv_filepattern,'all')
 		for dept in [77,78,91,92,93,94,95,75]:
-			get_dept_in_csv(session,str(dept),wordlist,csv_writer,transiscope,transi_wordlist)
+			get_dept_in_csv(str(dept),wordlist,csv_filename,transiscope,transi_wordlist)
 
-	# sites.analyse_site('http://www.avernes95.fr',wordlist)
-	# print(sites.analyse_site('http://www.vaujours.fr',wordlist))
-	# sites.inspect_page('http://www.vaujours.fr/-Les-espaces-natures-',wordlist)
-	# sites.inspect_page('http://www.vaujours.fr/Collecte-des-dechets',wordlist)
 	

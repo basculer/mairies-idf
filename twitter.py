@@ -36,6 +36,9 @@ def get_note(api,name,code,name_short,wordlist):
 		pertinence/2
 	return (score_twitter,float("{0:.3f}".format(pertinence)))
 
+def get_twitter_api(auth):
+	api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True, compression=True)
+	return api
 
 def init_twitter(twitter_api_file_name,total_coeffs_global,log_file_name):
 	global total_coeffs
@@ -53,8 +56,7 @@ def init_twitter(twitter_api_file_name,total_coeffs_global,log_file_name):
 	auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 	auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 	# Create the api to connect to twitter with your credentials
-	api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True, compression=True)
-	return(api)
+	return(auth)
 
 def get_raw_search(api,name,wordlist):
 	query = " ".join([word['name'] for word in wordlist])

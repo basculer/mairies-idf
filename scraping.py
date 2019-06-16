@@ -10,32 +10,22 @@ import wikipedia
 
 configfile = 'config.ini'
 log_filename = 'log.txt'
-csv_filename = 'misc.csv'
+# csv_filename = 'misc.csv'
 
-def initscrp(configfilename,dept,log_file_name):
+def initscrp(configfilename,log_file_name):
 	'''init global vars'''
 	global configfile,log_filename, csv_filename
 	configfile = configfilename
 	log_filename = log_file_name
-	(csv_filename_pattern)=init_csv(configfile)
-	session = HTMLSession()
-	csv_filename = csv_filename_pattern+dept+'.csv'
-	csv_writer = csv.writer(open(csv_filename,'w'))
-	return(session,csv_writer)
-
-def init_csv(configfile):
-	config=configparser.ConfigParser()
-	config.read(configfile)
-	csv_dir = config['CSV']['CSV_DIR']
-	csv_file = config['CSV']['CSV_FILE']
-	# os.remove(csv_dir+csv_file+dept+'.csv')
-	return(csv_dir+csv_file)
 
 
 
-def get_commune(session,commune,dept):
+def get_commune(commune,dept):
 	'''For each city in the format 'cityville-75042', gets in the 4 websites an array of information.
 	please use this method to change the look of the results (order of columns...) '''
+
+	session = HTMLSession()
+
 	url = commune.html.split('href="/mairie-')[1].split('.html')[0]
 	urlarray = url.split('-')
 	code = urlarray[len(urlarray)-1]
@@ -163,7 +153,7 @@ def mon_maire_fr(session,name,dept):
 	if('-st-' in name):
 		name = name.replace('-st-','-saint-')
 	if(name == 'auteuil'):
-		name = 'auteuil-le-roi'
+		name = 'auteuil-le-roi' #wtf
 	
 	page= session.get('http://www.mon-maire.fr/maire-de-'+name+'-'+dept)
 	(ville,nom_maire,telephone,email,site,adresse,population,conseil3) = ('','','','','','','','')
@@ -205,13 +195,6 @@ def mon_maire_fr(session,name,dept):
 	except IndexError:
 		log_error(name+'-'+dept,'mon_maire_fr : conseil')
 	return(ville,nom_maire,telephone,email,site,adresse,population,conseil3)
-
-
-
-def write_to_csv(writer,results):
-	'''append an array of results for a city in a csv file (specified by the global var
-	you can change here the look of the csv sheet as well'''
-	writer.writerow(results)
 
 
 def log_error(addr,funct):
