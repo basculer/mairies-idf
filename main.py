@@ -109,5 +109,7 @@ if __name__ == '__main__':
 		csv_filename = init_csv(csv_filepattern,'all')
 		for dept in [77,78,91,92,93,94,95,75]:
 			get_dept_in_csv(str(dept),wordlist,csv_filename,transiscope,transi_wordlist)
+	flag = open('finish.txt','w')
+	flag.write('finished at : '+str(datetime.datetime.now()))
+	flag.close()
 
-	
