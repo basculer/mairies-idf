@@ -68,6 +68,6 @@ def log_error(addr,funct):
 	'''logs a scraping/parsing error in the global variable-specified log file'''
 	print('######### Error dans la fonction '+funct+' du parsing de '+addr)
 	logfile = open(log_filename, "a")
-	logfile.write('######   ERROR : '+str(datetime.date.today())+'  #####\n')
+	logfile.write('######   ERROR : '+str(datetime.datetime.now())+'  #####\n')
 	logfile.write('Error dans la fonction '+funct+' du parsing de '+addr+'\n')
 	logfile.close()

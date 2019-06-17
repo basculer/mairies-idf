@@ -1,10 +1,6 @@
 #!/usr/bin/python3
 
 from requests_html import HTMLSession
-# from selenium import webdriver
-# from selenium.webdriver.firefox.options import Options
-# import time
-# from selenium.webdriver.common.keys import Keys
 import argparse
 try:
     import json
