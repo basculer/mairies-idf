@@ -91,7 +91,11 @@ def wiki_get_city(session,url):
 	tableau_etiquettes_maires = page.html.find('table.wikitable.centre.communes tr td[style^=text-align] a[href][title]')
 	if tableau_etiquettes_maires : etiquette = tableau_etiquettes_maires[len(tableau_etiquettes_maires)-1].text
 	#le code postal est dans une box avec une balise <a href="/wiki/Code_postal_en_France" title="Code postal en France">
-	box_code = page.html.find('tr',containing='Code postal')
+	
+	box_code = page.html.find('tr',containing="Code Postal")
+	# box_code = page.html.find('a[title~=postal] ~ td')
+	# print(str(box_code))
+	# print(box_code[0].text)
 	if box_code : code_postal = box_code[0].text.split('\n')[1]
 	box_maire = page.html.find('tr',containing='Maire Mandat')
 	if box_maire : nom_maire = box_maire[0].text.split('\n')[2]
@@ -203,3 +207,10 @@ def log_error(addr,funct):
 	logfile.write('######   ERROR : '+str(datetime.datetime.now())+'  #####\n')
 	logfile.write('Error dans la fonction '+funct+' du parsing de '+addr+'\n')
 	logfile.close()
+
+
+if __name__ == '__main__':
+	session = HTMLSession()
+	print(wiki_get_city(session,'https://fr.wikipedia.org/wiki/Vaujours'))
+	print(wiki_get_city(session,'https://fr.wikipedia.org/wiki/Noisy-le-Grand'))
+	print(wiki_get_city(session,'https://fr.wikipedia.org/wiki/Bondy'))
