@@ -85,6 +85,9 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	print('Using config file : '+str(args.config)+' and logging to : '+args.log)
+	flag_start = open('flag.txt','a')
+	flag_start.write('started at : '+str(datetime.datetime.now())+'\n')
+	flag_start.close()
 
 	#initie le fichier de config
 	(log_filename,wordlist,twitterapifile,transi_db_file,transi_wordlist,csv_filepattern) = init_config(args.config)
@@ -109,7 +112,7 @@ if __name__ == '__main__':
 		csv_filename = init_csv(csv_filepattern,'all')
 		for dept in [77,78,91,92,93,94,95,75]:
 			get_dept_in_csv(str(dept),wordlist,csv_filename,transiscope,transi_wordlist)
-	flag = open('finish.txt','w')
-	flag.write('finished at : '+str(datetime.datetime.now()))
-	flag.close()
+	flag_finish = open('flag.txt','w')
+	flag_finish.write('finished at : '+str(datetime.datetime.now())+'\n')
+	flag_finish.close()
 
