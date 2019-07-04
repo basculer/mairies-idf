@@ -110,7 +110,8 @@ if __name__ == '__main__':
 		# dans ce cas-la, tous les resultats seront ecrits dans un unique CSV central
 		scrp.initscrp(args.config,log_filename) 
 		csv_filename = init_csv(csv_filepattern,'all')
-		for dept in [77,78,91,92,93,94,95,75]:
+		# for dept in [77,78,91,92,93,94,95,75]:
+		for dept in [91,92,93,94,95,75]:
 			get_dept_in_csv(str(dept),wordlist,csv_filename,transiscope,transi_wordlist)
 	flag_finish = open('flag.txt','w')
 	flag_finish.write('finished at : '+str(datetime.datetime.now())+'\n')

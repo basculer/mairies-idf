@@ -35,7 +35,7 @@ def analyse_site(url,wordlist):
 def parse_site(url,session):
 	links_list = []
 	try:
-		page = session.get(url)
+		page = session.get(url,timeout=10)
 		links = page.html.find('a[href]')
 		url_short = url.split('.')[len(url.split('.'))-2]
 		# print('url short : '+url_short)
@@ -52,7 +52,7 @@ def inspect_page(url,wordlist,session):
 	session = HTMLSession()
 	try:
 		#marcherait aussi avec html
-		page = session.get(url).text.split(' ')
+		page = session.get(url, timeout=6).text.split(' ')
 		count = 0
 		for word in wordlist:
 			count += page.count(word['name'])*word['coef']
