@@ -68,7 +68,7 @@ def get_dept(session,dept):
 	page = session.get('https://www.mairie.biz/plan-mairie-'+dept+'.html')
 	liste_communes = page.html.find('div.list-group>a')
 	for i in range(1,7):
-		print('page '+ str(i) +' du dept : '+dept)
+		# print('page '+ str(i) +' du dept : '+dept)
 		page = session.get('https://www.mairie.biz/plan-mairie-'+dept+'-'+str(i)+'.html')
 		liste_communes.extend(page.html.find('div.list-group>a'))
 	# print(liste_communes)

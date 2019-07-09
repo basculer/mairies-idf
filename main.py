@@ -55,13 +55,14 @@ def get_dept_in_csv(dept,wordlist,csv_filename, transiscope,trans_wordlist):
 	session_list.close()
 	for commune in liste_communes:
 		get_commune_csv(csv_filename,commune,dept,wordlist,trans_wordlist,transiscope,twitter_api)
+		# print(commune)
 
 def get_commune_csv(csv_filename,commune,dept, wordlist,trans_wordlist, transiscope,twitter_api):
 	try:
 		results=scrp.get_commune(commune,dept)
-		# results.append(sites.analyse_site(results[6],wordlist))
-		# results.extend(twt.get_note(twitter_api,results[2],results[0],results[1],wordlist)) 
-		# results.extend(trans.get_city(transiscope,results[0],trans_wordlist))
+		results.append(sites.analyse_site(results[6],wordlist))
+		results.extend(twt.get_note(twitter_api,results[2],results[0],results[1],wordlist)) 
+		results.extend(trans.get_city(transiscope,results[0],trans_wordlist))
 		write_to_csv(csv_filename,results)
 	except:
 		logfile = open('log.txt', "a")
