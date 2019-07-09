@@ -64,9 +64,17 @@ def get_commune(commune,dept):
 
 def get_dept(session,dept):
 	'''returns city lists in the format 'cityville-75042'''
+	# get first page
 	page = session.get('https://www.mairie.biz/plan-mairie-'+dept+'.html')
 	liste_communes = page.html.find('div.list-group>a')
+	for i in range(1,7):
+		print('page '+ str(i) +' du dept : '+dept)
+		page = session.get('https://www.mairie.biz/plan-mairie-'+dept+'-'+str(i)+'.html')
+		liste_communes.extend(page.html.find('div.list-group>a'))
+	# print(liste_communes)
 	return (liste_communes)
+
+
 
 def get_wiki_page(session,ville):
 	'''from the name of a city gets the wikipedia page, handles errors and passes them to the parsing method'''

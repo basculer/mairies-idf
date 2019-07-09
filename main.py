@@ -55,14 +55,19 @@ def get_dept_in_csv(dept,wordlist,csv_filename, transiscope,trans_wordlist):
 	session_list.close()
 	for commune in liste_communes:
 		get_commune_csv(csv_filename,commune,dept,wordlist,trans_wordlist,transiscope,twitter_api)
-		# print(results)
 
 def get_commune_csv(csv_filename,commune,dept, wordlist,trans_wordlist, transiscope,twitter_api):
-	results=scrp.get_commune(commune,dept)
-	results.append(sites.analyse_site(results[6],wordlist))
-	results.extend(twt.get_note(twitter_api,results[2],results[0],results[1],wordlist)) 
-	results.extend(trans.get_city(transiscope,results[0],trans_wordlist))
-	write_to_csv(csv_filename,results)
+	try:
+		results=scrp.get_commune(commune,dept)
+		# results.append(sites.analyse_site(results[6],wordlist))
+		# results.extend(twt.get_note(twitter_api,results[2],results[0],results[1],wordlist)) 
+		# results.extend(trans.get_city(transiscope,results[0],trans_wordlist))
+		write_to_csv(csv_filename,results)
+	except:
+		logfile = open('log.txt', "a")
+		logfile.write('######   ERROR : '+str(datetime.datetime.now())+'  #####\n')
+		logfile.write('IN GET COMMUNE : '+commune+'\n')
+		logfile.close()
 
 
 def write_to_csv(csv_filename,results):
@@ -111,9 +116,9 @@ if __name__ == '__main__':
 		scrp.initscrp(args.config,log_filename) 
 		csv_filename = init_csv(csv_filepattern,'all')
 		# for dept in [77,78,91,92,93,94,95,75]:
-		for dept in [91,92,93,94,95,75]:
+		for dept in [77,78,91,92,93,94,95,75]:
 			get_dept_in_csv(str(dept),wordlist,csv_filename,transiscope,transi_wordlist)
-	flag_finish = open('flag.txt','w')
+	flag_finish = open('flag.txt','a')
 	flag_finish.write('finished at : '+str(datetime.datetime.now())+'\n')
 	flag_finish.close()
 
